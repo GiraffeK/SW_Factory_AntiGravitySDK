@@ -13,6 +13,7 @@ __pycache__/
 output_project/
 my_project/
 my_cache_project/
+image_viewer_*/
 
 # Logs and runtime files
 *.log

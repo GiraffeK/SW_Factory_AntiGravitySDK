@@ -86,6 +86,8 @@ class SoftwareFactory:
                 cwd=self.workspace_dir,
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
+                errors="replace",
                 timeout=60,
             )
             output = f"Stdout:\n{res.stdout}\n\nStderr:\n{res.stderr}"

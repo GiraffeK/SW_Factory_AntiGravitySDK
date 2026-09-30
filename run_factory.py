@@ -40,12 +40,18 @@ async def main():
         default="pytest -v",
         help="閉環品質驗證指令 (預設: pytest -v)",
     )
+    parser.add_argument(
+        "--model",
+        type=str,
+        default="gemini-3.5-flash",
+        help="主要使用的 Gemini 模型 (預設: gemini-3.5-flash)",
+    )
     args = parser.parse_args()
 
     task = args.task or DEFAULT_TASK
     workspace = os.path.abspath(args.output)
 
-    factory = SoftwareFactory(workspace_dir=workspace)
+    factory = SoftwareFactory(workspace_dir=workspace, primary_model=args.model)
     result = await factory.build(task=task, test_cmd=args.test_cmd)
 
     if result.success:

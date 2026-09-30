@@ -56,8 +56,8 @@ class SoftwareFactory:
         self,
         workspace_dir: str,
         api_key: str | None = None,
-        primary_model: str = "gemini-3.8-flash",
-        fallback_model: str = "gemini-3.5-flash",
+        primary_model: str = "gemini-3.5-flash",
+        fallback_model: str = "gemini-3.7-flash",
     ):
         self.workspace_dir = os.path.abspath(workspace_dir)
         os.makedirs(self.workspace_dir, exist_ok=True)
@@ -115,7 +115,7 @@ class SoftwareFactory:
         print("=" * 70 + "\n")
 
         models = self._build_models()
-        subagents = get_factory_subagents()
+        subagents = get_factory_subagents(model=self.primary_model)
         instructions = get_orchestrator_instructions(self.workspace_dir, test_cmd)
 
         config = LocalAgentConfig(

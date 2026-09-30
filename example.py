@@ -30,11 +30,11 @@ async def main():
         print("[提示] 未檢測到 GEMINI_API_KEY 環境變數，請檢查 .env 檔案。")
         return
 
-    # 優化 2.B：設定預設模型 (gemini-3.8-flash) 與備援模型 (gemini-3.5-flash)
+    # 優化 2.B：設定預設模型 (gemini-3.5-flash) 與備援模型 (gemini-3.7-flash)
     endpoint = GeminiAPIEndpoint(api_key=api_key)
     models = [
-        ModelTarget(name="gemini-3.8-flash", types=[ModelType.TEXT], endpoint=endpoint),
         ModelTarget(name="gemini-3.5-flash", types=[ModelType.TEXT], endpoint=endpoint),
+        ModelTarget(name="gemini-3.7-flash", types=[ModelType.TEXT], endpoint=endpoint),
     ]
 
     # 3. 配置 Agent

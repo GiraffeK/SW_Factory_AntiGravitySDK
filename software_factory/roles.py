@@ -8,7 +8,7 @@ from google.antigravity import BuiltinTools, AgentBehavior
 from google.antigravity.types import SubagentConfig, SubagentCapabilities
 
 
-def get_factory_subagents() -> list[SubagentConfig]:
+def get_factory_subagents(model: str = "gemini-3.5-flash") -> list[SubagentConfig]:
     """Returns the standardized subagents configured for the software factory."""
     autonomous_capabilities = SubagentCapabilities(
         enabled_tools=BuiltinTools.default(),
@@ -27,28 +27,31 @@ def get_factory_subagents() -> list[SubagentConfig]:
 4. 交付清晰的任務清單，讓 Coder 與 Tester 能精準配合。
 """,
             capabilities=autonomous_capabilities,
+            model=model,
         ),
         SubagentConfig(
             name="coder",
             description="全端/後端核心開發工程師。負責高質量、生產級程式碼的撰寫、重構與 Bug 修復。",
             system_instructions="""你是一位資深主力工程師 (Senior Software Engineer)。
 你的職責：
-1. 嚴格依照架構規格撰寫乾淨、健壯、符合 PEP 8 規範的生產級程式碼。
+1. 嚴格依照架構規格撰寫乾淨、健壯、符合規範的生產級程式碼。
 2. 加入完整的型別註解 (Type Hints) 與清晰的 Docstrings。
 3. 【關鍵能力：自我修復】當接收到測試失敗 (Test Failures) 或編譯錯誤時，仔細研讀 traceback 與日誌，定位根本原因並透過 edit_file / create_file 立即修正程式碼。
 """,
             capabilities=autonomous_capabilities,
+            model=model,
         ),
         SubagentConfig(
             name="tester",
             description="自動化測試與品質保證工程師 (QA/SDET)。負責編寫高覆蓋率的單元測試與整合測試。",
             system_instructions="""你是一位資深自動化測試架構師 (Senior QA / SDET)。
 你的職責：
-1. 針對功能需求與邊界條件，撰寫全覆蓋的 pytest / unittest 單元測試與整合測試。
+1. 針對功能需求與邊界條件，撰寫全覆蓋的單元測試與整合測試。
 2. 覆蓋正常路徑 (Happy Path)、邊界條件 (Boundary cases)、極端條件 (Edge cases) 以及異常錯誤處理 (Exception cases)。
 3. 使用 run_command 執行測試驗證，並在測試不通過時精準回報錯誤點。
 """,
             capabilities=autonomous_capabilities,
+            model=model,
         ),
         SubagentConfig(
             name="reviewer",
@@ -60,6 +63,7 @@ def get_factory_subagents() -> list[SubagentConfig]:
 3. 確保測試覆蓋完整且無假性通過 (Flaky tests)。
 """,
             capabilities=autonomous_capabilities,
+            model=model,
         ),
     ]
 

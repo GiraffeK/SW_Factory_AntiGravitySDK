@@ -29,6 +29,12 @@ async def main():
         help="軟體開發需求描述 (預設為非同步優先級佇列範例)",
     )
     parser.add_argument(
+        "--task-file",
+        type=str,
+        default=None,
+        help="從文字檔讀取任務需求描述 (避免 PowerShell 多行跳脫問題)",
+    )
+    parser.add_argument(
         "--output",
         type=str,
         default="./output_project",
@@ -48,7 +54,11 @@ async def main():
     )
     args = parser.parse_args()
 
-    task = args.task or DEFAULT_TASK
+    if args.task_file and os.path.exists(args.task_file):
+        with open(args.task_file, "r", encoding="utf-8") as f:
+            task = f.read().strip()
+    else:
+        task = args.task or DEFAULT_TASK
     workspace = os.path.abspath(args.output)
 
     factory = SoftwareFactory(workspace_dir=workspace, primary_model=args.model)

@@ -1,0 +1,23 @@
+# Environment variables and secrets
+.env
+*.env
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Output directories created by the Software Factory
+output_project/
+my_project/
+my_cache_project/
+
+# Logs and runtime files
+*.log
+antigravity_*/
+
+# IDE and Editor files
+.vscode/
+.idea/

@@ -3,7 +3,7 @@
 我需要一個現代、低延遲、高幀率（支援 60fps/120fps）且資源佔用極低的桌面級螢幕錄影程式。請為我設計並實作該系統。
 
 ### 技術選型要求：
-1. 目標平台：Windows (C# / .NET 10)
+1. 目標平台：Windows (C# winform/ .NET 10)
 2. 影像擷取：使用原生零拷貝（Zero-copy）API（如 Windows 的 Windows.Graphics.Capture API），嚴禁使用低效的定時截圖輪詢。
 3. 硬體加速編碼：優先啟用 GPU 硬體編碼（NVENC / QSV / AMF），支援 H.264/HEVC/AV1，輸出容器支援 MP4 或防損壞的 MKV。
 4. 音訊架構：
@@ -11,6 +11,7 @@
    - 時間戳同步：嚴格校準音訊與影像的 PTS（Presentation Timestamp），防止長錄影發生音畫不同步。
 5. 執行緒模型：
    - 擷取、編碼、磁碟 I/O 必須使用無鎖隊列（Lock-free Queue）或高效能 Ring Buffer 進行線程隔離，避免寫入卡頓影響擷取幀率。
+6. 讓我能用滑鼠框定錄影區域。
 
 ### 請按以下結構分步驟提供方案與實作代碼：
 1. 【系統架構圖與數據流向】：說明 Capture -> Buffer -> Encoder -> Muxer 的管線架構。

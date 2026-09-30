@@ -22,3 +22,13 @@ antigravity_*/
 # IDE and Editor files
 .vscode/
 .idea/
+
+# .NET Build Artifacts
+bin/
+obj/
+*.user
+*.suo
+.factory_app_data/
+*.mkv
+*.mp4
+

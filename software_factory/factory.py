@@ -95,6 +95,41 @@ class SoftwareFactory:
         except Exception as e:
             return False, f"Failed to execute verification command: {e}"
 
+    async def _safe_chat(
+        self, orchestrator: Agent, prompt: str, max_retries: int = 5
+    ) -> str:
+        """Executes orchestrator.chat with streaming and automatic 429 rate limit backoff."""
+        accumulated_text = ""
+        current_prompt = prompt
+
+        for attempt in range(1, max_retries + 1):
+            try:
+                response = await orchestrator.chat(current_prompt)
+                async for token in response:
+                    sys.stdout.write(token)
+                    sys.stdout.flush()
+                    accumulated_text += token
+                return accumulated_text
+            except Exception as e:
+                err_msg = str(e)
+                if (
+                    "429" in err_msg
+                    or "RESOURCE_EXHAUSTED" in err_msg
+                    or "Quota exceeded" in err_msg
+                    or "retryDelay" in err_msg
+                ):
+                    import re
+                    match = re.search(r'retryDelay["\']?:\s*["\']?([0-9.]+)', err_msg)
+                    wait_seconds = float(match.group(1)) + 5.0 if match else 45.0
+                    print(
+                        f"\n⏳ [429 速率限制保護] 觸發 API 每分鐘頻率上限，自動冷卻 {wait_seconds:.1f} 秒後恢復 (重試 {attempt}/{max_retries})..."
+                    )
+                    await asyncio.sleep(wait_seconds)
+                    current_prompt = "請繼續剛才受到頻率限制而暫停的步驟，檢視工作區狀態並完成未完成的工作。"
+                else:
+                    raise
+        return accumulated_text
+
     async def build(
         self,
         task: str,
@@ -120,12 +155,27 @@ class SoftwareFactory:
         subagents = get_factory_subagents(model=self.primary_model)
         instructions = get_orchestrator_instructions(self.workspace_dir, test_cmd)
 
+        factory_app_data = os.path.abspath(os.path.join(self.workspace_dir, ".factory_app_data"))
+        os.makedirs(factory_app_data, exist_ok=True)
+
+        from google.antigravity import types as agy_types
+        retry_config = agy_types.RetryConfig(
+            api_retry=agy_types.ModelAPIRetryConfig(
+                max_retries=6,
+                initial_sleep_duration_ms=10000,
+                exponential_multiplier=1.8,
+            )
+        )
+
         config = LocalAgentConfig(
             models=models,
             system_instructions=instructions,
             workspaces=[self.workspace_dir],
             subagents=subagents,
             policies=[allow_all()],
+            skills_paths=[],  # 停用全域無關插件，減少 99% 的無效 Token 消耗
+            app_data_dir=factory_app_data,  # 隔離專案應用資料夾
+            retry_config=retry_config,  # 啟用自動指數退避重試，遇 429 自動等待冷卻
             capabilities=CapabilitiesConfig(
                 agent_behavior=AgentBehavior.AUTONOMOUS,
             ),
@@ -146,10 +196,7 @@ class SoftwareFactory:
                 f"並於工作區 [{self.workspace_dir}] 執行 `{test_cmd}` 進行初次驗證。"
             )
 
-            response = await orchestrator.chat(initial_prompt)
-            async for token in response:
-                sys.stdout.write(token)
-                sys.stdout.flush()
+            await self._safe_chat(orchestrator, initial_prompt)
             print("\n")
 
             # 階段二：獨立品管閘門與閉環自我修復 (Closed-Loop Quality Gate)
@@ -175,10 +222,7 @@ class SoftwareFactory:
                         f"請調用 coder 分析上述錯誤根本原因，修正相關檔案，確保所有測試通過。"
                     )
 
-                    repair_resp = await orchestrator.chat(repair_prompt)
-                    async for token in repair_resp:
-                        sys.stdout.write(token)
-                        sys.stdout.flush()
+                    await self._safe_chat(orchestrator, repair_prompt)
                     print("\n")
 
                     # 再次驗證
@@ -198,10 +242,7 @@ class SoftwareFactory:
                 f"請檢查工作區根目錄，產生最終的 `FACTORY_REPORT.md`，"
                 f"統整本次架構設計、核心模組清單、測試結果與使用說明。"
             )
-            report_resp = await orchestrator.chat(report_prompt)
-            report_content = ""
-            async for token in report_resp:
-                report_content += token
+            report_content = await self._safe_chat(orchestrator, report_prompt)
 
         print("\n" + "=" * 70)
         status_text = "SUCCESS ✅ (100% Passed)" if success else "FAILED ❌ (Requires Human Inspection)"

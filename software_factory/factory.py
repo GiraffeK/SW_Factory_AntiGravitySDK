@@ -56,8 +56,8 @@ class SoftwareFactory:
         self,
         workspace_dir: str,
         api_key: str | None = None,
-        primary_model: str = "gemini-3.5-flash",
-        fallback_model: str = "gemini-3.7-flash",
+        primary_model: str = "gemini-3-flash-preview",
+        fallback_model: str = "gemini-3.1-flash-lite-preview",
     ):
         self.workspace_dir = os.path.abspath(workspace_dir)
         os.makedirs(self.workspace_dir, exist_ok=True)

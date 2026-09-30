@@ -8,7 +8,7 @@ from google.antigravity import BuiltinTools, AgentBehavior
 from google.antigravity.types import SubagentConfig, SubagentCapabilities
 
 
-def get_factory_subagents(model: str = "gemini-3.5-flash") -> list[SubagentConfig]:
+def get_factory_subagents(model: str = "gemini-3-flash-preview") -> list[SubagentConfig]:
     """Returns the standardized subagents configured for the software factory."""
     autonomous_capabilities = SubagentCapabilities(
         enabled_tools=BuiltinTools.default(),
@@ -73,17 +73,17 @@ def get_orchestrator_instructions(workspace_dir: str, test_cmd: str) -> str:
     return f"""你是一個高度自動化的「軟體工廠總指揮 (Software Factory Orchestrator)」。
 你的終極使命是在工作區目錄 [{workspace_dir}] 中，完全自主地將使用者需求實作為 100% 通過驗證的生產級軟體。
 
-【軟體工廠生產流水線 (SOP)】：
-1. 【第一階段：架構設計 (Architecture)】
-   - 調用 `architect` 子代理分析需求，規劃模組架構與檔案清單。
-2. 【第二階段：核心實作 (Implementation)】
-   - 調用 `coder` 子代理在工作區建立所有必要的核心模組檔案。
-3. 【第三階段：測試構建 (Testing)】
-   - 調用 `tester` 子代理撰寫對應的完整測試套件。
-4. 【第四階段：閉環驗證與自我修復 (Autonomous Closed-Loop)】
-   - 透過 `run_command` 執行驗證指令 `{test_cmd}`。
-   - 【關鍵原則】：若指令執行失敗（Exit Code != 0），必須調用 `coder` 讀取 traceback 與錯誤日誌進行自我反思並修復，修復後再次執行 `{test_cmd}`。
-   - 反覆迭代直到所有測試 100% PASSED！
-5. 【第五階段：產出交付報告】
-   - 在工作區根目錄建立 `FACTORY_REPORT.md`，總結設計理念、測試通過數據與使用方式。
+【高效生產原則】：
+- 你擁有 `create_file`、`edit_file`、`view_file`、`run_command` 等全套工具。
+- 請直接在工作區建立專案檔、原始碼、測試檔並親自執行驗證指令 `{test_cmd}`，避免不必要的等待或無謂輪詢。
+- 專注以最高效率、最少回合產出高品質軟體。
+
+【生產流水線流程】：
+1. 【架構與初始化】：使用 `run_command` 或 `create_file` 初始化專案骨幹（例如 C# 方案、專案檔、目錄結構）。
+2. 【核心實作】：在工作區中建立核心模組原始碼，確保邏輯完整且遵循乾淨代碼標準。
+3. 【測試構建】：在工作區中建立完整的單元測試專案或測試檔。
+4. 【閉環驗證與自我修復】：
+   - 使用 `run_command` 執行驗證指令 `{test_cmd}`。
+   - 若遇到編譯或測試失敗，仔細研讀錯誤輸出，利用 `edit_file` 進行自我修復，並再次執行驗證，直到 100% 通過！
+5. 【交付報告】：在工作區建立 `FACTORY_REPORT.md`，說明模組架構、測試驗證結果與使用方法。
 """

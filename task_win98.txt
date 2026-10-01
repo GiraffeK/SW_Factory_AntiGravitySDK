@@ -1,0 +1,1 @@
+請以C# .net 設計一個高效能windows 98模擬器，此windows 98模擬器跑起來後可以run當時的game例如dome or aoe2, 接受mouse, keyboard, audio, video等IO interface.

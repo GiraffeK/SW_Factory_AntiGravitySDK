@@ -1,7 +1,4 @@
 <Solution>
-  <Project Path="ScreenRecorderApp.Tests/ScreenRecorderApp.Tests.csproj" />
-  <Project Path="ScreenRecorderApp/ScreenRecorderApp.csproj" />
-  <Project Path="ScreenRecorderLib/ScreenRecorderLib.csproj" />
-  <Project Path="ScreenRecorderCore/ScreenRecorderCore.csproj" />
-  <Project Path="ScreenRecorderTests/ScreenRecorderTests.csproj" />
+  <Project Path="ScreenRecorder.Core/ScreenRecorder.Core.csproj" />
+  <Project Path="ScreenRecorder.Tests/ScreenRecorder.Tests.csproj" />
 </Solution>

@@ -49,8 +49,8 @@ async def main():
     parser.add_argument(
         "--model",
         type=str,
-        default="gemini-3-flash-preview",
-        help="主要使用的 Gemini 模型 (預設: gemini-3-flash-preview)",
+        default="gemini-3.5-flash-lite",
+        help="主要使用的 Gemini 模型 (預設: gemini-3.5-flash-lite，支援自動健康探測與 Fallback 輪替)",
     )
     args = parser.parse_args()
 
